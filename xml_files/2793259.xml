@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<alto xmlns="http://www.loc.gov/standards/alto/ns-v3#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/standards/alto/ns-v3# http://www.loc.gov/standards/alto/v3/alto-3-1.xsd">
+ <Description>
+  <MeasurementUnit>
+   pixel
+  </MeasurementUnit>
+  <sourceImageInformation>
+   <fileIdentifier>
+    2793259
+   </fileIdentifier>
+  </sourceImageInformation>
+ </Description>
+ <Layout>
+  <Page HEIGHT="2731" ID="p2793259" PHYSICAL_IMG_NR="1" WIDTH="1935">
+   <PrintSpace HEIGHT="2731" HPOS="0" ID="ps2793259" VPOS="0" WIDTH="1935">
+    <TextBlock HEIGHT="2731" HPOS="0" ID="tb2793259" VPOS="0" WIDTH="1935"/>
+   </PrintSpace>
+  </Page>
+ </Layout>
+</alto>

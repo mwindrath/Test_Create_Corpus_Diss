@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<alto xmlns="http://www.loc.gov/standards/alto/ns-v3#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/standards/alto/ns-v3# http://www.loc.gov/standards/alto/v3/alto-3-1.xsd">
+ <Description>
+  <MeasurementUnit>
+   pixel
+  </MeasurementUnit>
+  <sourceImageInformation>
+   <fileIdentifier>
+    2793258
+   </fileIdentifier>
+  </sourceImageInformation>
+ </Description>
+ <Layout>
+  <Page HEIGHT="2731" ID="p2793258" PHYSICAL_IMG_NR="1" WIDTH="1930">
+   <PrintSpace HEIGHT="2731" HPOS="0" ID="ps2793258" VPOS="0" WIDTH="1930">
+    <TextBlock HEIGHT="2731" HPOS="0" ID="tb2793258" VPOS="0" WIDTH="1930">
+     <TextLine HEIGHT="245" HPOS="1146" ID="tl0" VPOS="438" WIDTH="85">
+      <String CONTENT="ze" HEIGHT="44" HPOS="1146" ID="st0" VPOS="438" WIDTH="54"/>
+      <String CONTENT="." HEIGHT="44" HPOS="1200" ID="st1" VPOS="438" WIDTH="27"/>
+      <String CONTENT="=" HEIGHT="44" HPOS="1147" ID="st2" VPOS="639" WIDTH="84"/>
+     </TextLine>
+     <TextLine HEIGHT="245" HPOS="1087" ID="tl1" VPOS="437" WIDTH="66">
+      <String CONTENT="en" HEIGHT="245" HPOS="1087" ID="st3" VPOS="437" WIDTH="66"/>
+     </TextLine>
+     <TextLine HEIGHT="242" HPOS="987" ID="tl2" VPOS="437" WIDTH="101">
+      <String CONTENT="SS" HEIGHT="246" HPOS="987" ID="st4" VPOS="437" WIDTH="97"/>
+      <String CONTENT="=" HEIGHT="62" HPOS="965" ID="st5" VPOS="617" WIDTH="123"/>
+     </TextLine>
+     <TextLine HEIGHT="144" HPOS="993" ID="tl3" VPOS="538" WIDTH="42">
+      <String CONTENT="Ne" HEIGHT="144" HPOS="993" ID="st6" VPOS="538" WIDTH="42"/>
+     </TextLine>
+     <TextLine HEIGHT="246" HPOS="912" ID="tl4" VPOS="436" WIDTH="92">
+      <String CONTENT="Be" HEIGHT="246" HPOS="912" ID="st7" VPOS="436" WIDTH="92"/>
+     </TextLine>
+     <TextLine HEIGHT="246" HPOS="873" ID="tl5" VPOS="436" WIDTH="51">
+      <String CONTENT="Ko" HEIGHT="246" HPOS="873" ID="st8" VPOS="436" WIDTH="51"/>
+     </TextLine>
+     <TextLine HEIGHT="248" HPOS="824" ID="tl6" VPOS="435" WIDTH="43">
+      <String CONTENT="ON" HEIGHT="246" HPOS="824" ID="st9" VPOS="435" WIDTH="26"/>
+      <String CONTENT="." HEIGHT="246" HPOS="850" ID="st10" VPOS="435" WIDTH="13"/>
+      <SP/>
+      <String CONTENT="EB" HEIGHT="49" HPOS="814" ID="st11" VPOS="634" WIDTH="53"/>
+     </TextLine>
+     <TextLine HEIGHT="245" HPOS="770" ID="tl7" VPOS="436" WIDTH="45">
+      <String CONTENT="A" HEIGHT="44" HPOS="770" ID="st12" VPOS="436" WIDTH="42"/>
+      <String CONTENT="&amp;" HEIGHT="45" HPOS="773" ID="st13" VPOS="636" WIDTH="21"/>
+      <String CONTENT=")" HEIGHT="45" HPOS="794" ID="st14" VPOS="636" WIDTH="21"/>
+     </TextLine>
+     <TextLine HEIGHT="70" HPOS="783" ID="tl8" VPOS="1521" WIDTH="431">
+      <String CONTENT="DACHAU" HEIGHT="70" HPOS="783" ID="st15" VPOS="1521" WIDTH="431"/>
+     </TextLine>
+    </TextBlock>
+   </PrintSpace>
+  </Page>
+ </Layout>
+</alto>

@@ -1,0 +1,58 @@
+<?xml version="1.0" ?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Dachau: Erinnerungen eines katholischen Geistlichen aus der Zeit seiner Gefangenschaft 1941-1945</title>
+        <author>Carls, Hans</author>
+      </titleStmt>
+      <editionStmt>
+        <edition>Digitale Edition</edition>
+      </editionStmt>
+      <publicationStmt>
+        <publisher>Bachem</publisher>
+        <date when="1946">1946</date>
+        <idno type="URN">urn:nbn:de:hebis:26-digisam-103063</idno>
+      </publicationStmt>
+      <seriesStmt>
+        <title>Dokumente zur Zeitgeschichte</title>
+        <biblScope unit="volume">2</biblScope>
+      </seriesStmt>
+      <sourceDesc>
+        <bibl>
+          <title>Dachau: Erinnerungen eines katholischen Geistlichen aus der Zeit seiner Gefangenschaft 1941-1945</title>
+          <author>Carls, Hans</author>
+          <publisher>Bachem</publisher>
+          <date when="1946">1946</date>
+          <extent>218 Seiten</extent>
+        </bibl>
+      </sourceDesc>
+    </fileDesc>
+    <profileDesc>
+      <langUsage>
+        <language ident="ger">ger</language>
+      </langUsage>
+      <textClass>
+        <keywords>
+          <term>Erlebnisbericht</term>
+        </keywords>
+      </textClass>
+    </profileDesc>
+    <revisionDesc>
+      <change when="2026-03-20">Automatisch aus ALTO-XML konvertiert</change>
+    </revisionDesc>
+  </teiHeader>
+  <text>
+    <body>
+      <l>ze . =</l>
+      <l>en</l>
+      <l>SS =</l>
+      <l>Ne</l>
+      <l>Be</l>
+      <l>Ko</l>
+      <l>ON . EB</l>
+      <l>A &amp; )</l>
+      <l>DACHAU</l>
+    </body>
+  </text>
+</TEI>
