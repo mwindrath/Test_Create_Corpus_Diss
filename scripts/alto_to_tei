@@ -1,0 +1,278 @@
+import xml.etree.ElementTree as ET
+from datetime import datetime
+import os
+import argparse
+
+
+# Namespaces
+NS = {
+    'alto': 'http://www.loc.gov/standards/alto/ns-v3#',
+    'mets': 'http://www.loc.gov/METS/',
+    'mods': 'http://www.loc.gov/mods/v3',
+    'oai':  'http://www.openarchives.org/OAI/2.0/',
+}
+
+
+def prettify(element, indent='  '):
+    from xml.dom import minidom
+    rough_string = ET.tostring(element, 'utf-8')
+    reparsed = minidom.parseString(rough_string)
+    return reparsed.toprettyxml(indent=indent)
+
+
+def get_text(element, xpath, namespaces=NS, default=''):
+    """Hilfsfunktion: gibt den bereinigten Text eines XPath-Treffers zurück."""
+    node = element.find(xpath, namespaces)
+    if node is not None and node.text:
+        return node.text.strip()
+    return default
+
+
+def read_mets_metadata(mets_path):
+    """
+    Liest bibliografische Metadaten aus einer METS/MODS-Datei (auch OAI-PMH-Wrapper).
+    Gibt ein dict zurück mit: title, authors, publisher, place, date_issued,
+    language, extent, urn, genre, series_title, series_volume.
+    """
+    tree = ET.parse(mets_path)
+    root = tree.getroot()
+
+    mods = root.find('.//mods:mods', NS)
+    if mods is None:
+        raise ValueError(f"Keine mods:mods-Sektion in {mets_path} gefunden.")
+
+    # Titel und Untertitel
+    title    = get_text(mods, 'mods:titleInfo/mods:title')
+    subtitle = get_text(mods, 'mods:titleInfo/mods:subTitle')
+    full_title = f"{title}: {subtitle}" if subtitle else title
+
+    # Alle Autoren (Rolle "aut")
+    authors = []
+    for name in mods.findall('mods:name', NS):
+        role_code = get_text(name, 'mods:role/mods:roleTerm[@type="code"]')
+        if role_code == 'aut':
+            display = get_text(name, 'mods:displayForm')
+            if not display:
+                given  = get_text(name, 'mods:namePart[@type="given"]')
+                family = get_text(name, 'mods:namePart[@type="family"]')
+                display = f"{given} {family}".strip()
+            if display:
+                authors.append(display)
+
+    # Verlag und Erscheinungsort: bevorzuge Originalausgabe (kein <edition>-Element)
+    publisher   = ''
+    place       = ''
+    date_issued = ''
+    for orig in mods.findall('mods:originInfo', NS):
+        edition = get_text(orig, 'mods:edition')
+        if not edition:
+            publisher   = get_text(orig, 'mods:publisher') or publisher
+            place       = get_text(orig, 'mods:placeTerm[@type="text"]') or place
+            date_issued = get_text(orig, 'mods:dateIssued[@keyDate="yes"]') or \
+                          get_text(orig, 'mods:dateIssued') or date_issued
+
+    language     = get_text(mods, 'mods:language/mods:languageTerm[@type="code"]')
+    extent       = get_text(mods, 'mods:physicalDescription/mods:extent')
+    urn          = get_text(mods, 'mods:identifier[@type="urn"]')
+    genre        = get_text(mods, 'mods:genre')
+    series_title = get_text(mods, 'mods:relatedItem[@type="series"]/mods:titleInfo/mods:title')
+    series_volume= get_text(mods, 'mods:relatedItem[@type="series"]/mods:part/mods:detail[@type="volume"]/mods:number')
+
+    return {
+        'title':         full_title,
+        'authors':       authors,
+        'publisher':     publisher,
+        'place':         place,
+        'date_issued':   date_issued,
+        'language':      language,
+        'extent':        extent,
+        'urn':           urn,
+        'genre':         genre,
+        'series_title':  series_title,
+        'series_volume': series_volume,
+    }
+
+
+def build_tei_header(meta):
+    """Erstellt einen vollständigen teiHeader aus dem Metadaten-dict."""
+    tei_header = ET.Element("teiHeader")
+
+    # --- fileDesc ---
+    file_desc = ET.SubElement(tei_header, "fileDesc")
+
+    # titleStmt
+    title_stmt = ET.SubElement(file_desc, "titleStmt")
+    title_el = ET.SubElement(title_stmt, "title")
+    title_el.text = meta['title']
+    for author_name in meta['authors']:
+        author_el = ET.SubElement(title_stmt, "author")
+        author_el.text = author_name
+
+    # editionStmt
+    edition_stmt = ET.SubElement(file_desc, "editionStmt")
+    edition_el = ET.SubElement(edition_stmt, "edition")
+    edition_el.text = "Digitale Edition"
+
+    # publicationStmt
+    pub_stmt = ET.SubElement(file_desc, "publicationStmt")
+    publisher_el = ET.SubElement(pub_stmt, "publisher")
+    publisher_el.text = meta['publisher']
+    if meta['place']:
+        pubPlace_el = ET.SubElement(pub_stmt, "pubPlace")
+        pubPlace_el.text = meta['place']
+    date_el = ET.SubElement(pub_stmt, "date")
+    date_el.set("when", meta['date_issued'])
+    date_el.text = meta['date_issued']
+    if meta['urn']:
+        idno_el = ET.SubElement(pub_stmt, "idno")
+        idno_el.set("type", "URN")
+        idno_el.text = meta['urn']
+
+    # seriesStmt
+    if meta['series_title']:
+        series_stmt = ET.SubElement(file_desc, "seriesStmt")
+        series_title_el = ET.SubElement(series_stmt, "title")
+        series_title_el.text = meta['series_title']
+        if meta['series_volume']:
+            biblScope_el = ET.SubElement(series_stmt, "biblScope")
+            biblScope_el.set("unit", "volume")
+            biblScope_el.text = meta['series_volume']
+
+    # sourceDesc
+    source_desc = ET.SubElement(file_desc, "sourceDesc")
+    bibl = ET.SubElement(source_desc, "bibl")
+    ET.SubElement(bibl, "title").text = meta['title']
+    for author_name in meta['authors']:
+        ET.SubElement(bibl, "author").text = author_name
+    if meta['publisher']:
+        ET.SubElement(bibl, "publisher").text = meta['publisher']
+    if meta['place']:
+        ET.SubElement(bibl, "pubPlace").text = meta['place']
+    if meta['date_issued']:
+        d = ET.SubElement(bibl, "date")
+        d.set("when", meta['date_issued'])
+        d.text = meta['date_issued']
+    if meta['extent']:
+        ET.SubElement(bibl, "extent").text = meta['extent']
+
+    # --- profileDesc ---
+    profile_desc = ET.SubElement(tei_header, "profileDesc")
+    if meta['language']:
+        lang_usage = ET.SubElement(profile_desc, "langUsage")
+        language_el = ET.SubElement(lang_usage, "language")
+        language_el.set("ident", meta['language'])
+        language_el.text = meta['language']
+    if meta['genre']:
+        text_class = ET.SubElement(profile_desc, "textClass")
+        keywords = ET.SubElement(text_class, "keywords")
+        ET.SubElement(keywords, "term").text = meta['genre']
+
+    # --- revisionDesc ---
+    revision_desc = ET.SubElement(tei_header, "revisionDesc")
+    change = ET.SubElement(revision_desc, "change")
+    change.set("when", datetime.now().strftime("%Y-%m-%d"))
+    change.text = "Automatisch aus ALTO-XML konvertiert"
+
+    return tei_header
+
+
+def convert_alto_to_tei(alto_file_path, output_folder, meta):
+    """Konvertiert eine ALTO-XML-Datei in TEI-XML unter Verwendung der METS-Metadaten."""
+    tree = ET.parse(alto_file_path)
+    alto_root = tree.getroot()
+
+    tei_root = ET.Element("TEI")
+    tei_root.set("xmlns", "http://www.tei-c.org/ns/1.0")
+    tei_root.append(build_tei_header(meta))
+
+    text_element = ET.SubElement(tei_root, "text")
+    body_element = ET.SubElement(text_element, "body")
+
+    for line in alto_root.findall('.//alto:TextLine', NS):
+        line_element = ET.SubElement(body_element, "l")
+        line_text = ' '.join(
+            [s.attrib['CONTENT'] for s in line.findall('alto:String', NS)]
+        )
+        line_element.text = line_text
+
+    base_name = os.path.splitext(os.path.basename(alto_file_path))[0]
+    tei_file_path = os.path.join(output_folder, f"{base_name}-tei.xml")
+
+    pretty_xml = prettify(tei_root)
+    with open(tei_file_path, 'w', encoding='utf-8') as f:
+        f.write(pretty_xml)
+
+    print(f"  -> Erstellt: {tei_file_path}")
+    return tei_file_path
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Konvertiert ALTO-XML-Dateien in TEI-XML mit Metadaten aus einer METS-Datei."
+    )
+    parser.add_argument(
+        "input_folder",
+        help="Ordner mit ALTO-XML-Dateien (.xml)"
+    )
+    parser.add_argument(
+        "output_folder",
+        help="Ordner für die erstellten TEI-XML-Dateien"
+    )
+    parser.add_argument(
+        "--mets",
+        default=None,
+        help="Pfad zur METS-Datei (Standard: <input_folder>/mets/mets.xml)"
+    )
+    args = parser.parse_args()
+
+    input_folder  = args.input_folder
+    output_folder = args.output_folder
+    mets_path     = args.mets or os.path.join(input_folder, 'mets', 'mets.xml')
+
+    if not os.path.isdir(input_folder):
+        print(f"Fehler: Eingabeordner '{input_folder}' nicht gefunden.")
+        return
+
+    if not os.path.isfile(mets_path):
+        print(f"Fehler: METS-Datei '{mets_path}' nicht gefunden.")
+        return
+
+    os.makedirs(output_folder, exist_ok=True)
+
+    print(f"Lese Metadaten aus: {mets_path}")
+    try:
+        meta = read_mets_metadata(mets_path)
+        print(f"  Titel:     {meta['title']}")
+        print(f"  Autor(en): {', '.join(meta['authors']) or '–'}")
+        print(f"  Verlag:    {meta['publisher']} ({meta['place']}, {meta['date_issued']})\n")
+    except Exception as e:
+        print(f"Fehler beim Lesen der METS-Datei: {e}")
+        return
+
+    xml_files = sorted([f for f in os.listdir(input_folder) if f.lower().endswith('.xml')])
+
+    if not xml_files:
+        print(f"Keine XML-Dateien in '{input_folder}' gefunden.")
+        return
+
+    print(f"Verarbeite {len(xml_files)} Datei(en) aus '{input_folder}'...")
+    print(f"Ausgabe nach '{output_folder}':\n")
+
+    erfolge = 0
+    fehler  = 0
+
+    for filename in xml_files:
+        filepath = os.path.join(input_folder, filename)
+        print(f"Verarbeite: {filename}")
+        try:
+            convert_alto_to_tei(filepath, output_folder, meta)
+            erfolge += 1
+        except Exception as e:
+            print(f"  -> Fehler bei {filename}: {e}")
+            fehler += 1
+
+    print(f"\nFertig: {erfolge} erfolgreich, {fehler} fehlgeschlagen.")
+
+
+if __name__ == "__main__":
+    main()
